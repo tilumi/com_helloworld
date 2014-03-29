@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="HelloWorld component" default="deploy" basedir=".">
+	<property name="test_root" value="${phing.dir}/../Joomla" />
+	<property name="src" value="${phing.dir}" />
+	<property name="test_site_dir" value="${test_root}/components/com_helloworld" />
+	<property name="test_admin_dir"
+		value="${test_root}/administrator/components/com_helloworld" />
+
+	<fileset dir="${src}" id="all_files">
+			<include name="**/*" />
+			<exclude name=".**/*" />
+			<exclude name="*.gz" />
+			<exclude name="*.zip" />
+			<exclude name="build.xml" />
+	</fileset>
+
+	<fileset dir="${src}/site" id="site_all_files">
+		<include name="**/*" />
+	</fileset>
+
+	<fileset dir="${src}/admin" id="admin_all_files">
+		<include name="**/*" />
+	</fileset>
+
+	<target name="deploy" description="Copies files to test project."
+		depends="clean">
+		<phingcall target="package" />
+		<echo message="Running build.xml. Copying files from dev to test..." />
+
+		<copy todir="${test_site_dir}">
+			<fileset refid="site_all_files" />
+		</copy>
+		<copy todir="${test_admin_dir}">
+			<fileset refid="admin_all_files" />
+		</copy>
+	</target>
+
+	<target name="package">
+		<echo msg="Creating archive..." />
+		<delete file="${src}/com_helloworld.tar.gz" quiet="true" />
+		<tar destfile="${src}/com_helloworld.tar.gz" compression="gzip">
+			<fileset refid="all_files" />
+		</tar>
+		<delete file="${src}/com_helloworld.zip" quiet="true" />
+		<zip destfile="${src}/com_helloworld.zip">
+			<fileset refid="all_files" />
+		</zip>
+	</target>
+
+	<target name="clean">
+		<delete includeemptydirs="true">
+			<fileset dir="${test_site_dir}">
+				<include name="**/*" />
+			</fileset>
+		</delete>
+		<delete includeemptydirs="true">
+			<fileset dir="${test_admin_dir}">
+				<include name="**/*" />
+			</fileset>
+		</delete>
+		<mkdir dir="${test_site_dir}" />
+		<mkdir dir="${test_admin_dir}" />
+	</target>
+</project>
